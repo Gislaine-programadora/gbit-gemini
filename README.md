@@ -24,7 +24,7 @@ npm run dev
 ## 🏗️ Build
 
 ```bash
-npm run build
+npx gbit-build
 ```
 
 ## 🎨 Tema
