@@ -13,7 +13,7 @@
 ## 🚀 Início Rápido
 
 ```bash
- npx create-gbit-app@Latest "meu-projeto"
+ npx create-gbit-app@latest "meu-projeto"
 ```
 
 # gbit-gemini - Frontend

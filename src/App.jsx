@@ -3,7 +3,10 @@ import { Code, Copy, Zap, Loader2, BookOpen, Repeat, Lightbulb, MessageSquare, C
 
 // --- CONFIGURAÇÕES DA API GEMINI ---
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+
 
 // System Prompts (Personas da IA)
 const explainerSystemPrompt = "Atue como um tutor de programação especialista e amigável. Analise o código fornecido e explique detalhadamente, em português, o que ele faz, como funciona e quais conceitos de programação (ex: closure, assincronicidade, loops) ele demonstra. Estruture a resposta com clareza usando Markdown, focando em ser didático.";
