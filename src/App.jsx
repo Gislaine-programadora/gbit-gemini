@@ -2,50 +2,51 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Code, Copy, Zap, Loader2, BookOpen, Repeat, Lightbulb, MessageSquare, CodeXml, CornerDownLeft, Send } from 'lucide-react';
 
 // --- CONFIGURAÇÕES DA API GEMINI ---
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
-
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
-
+// Lê a URL do backend: http://localhost:3000/api
+const PROXY_URL = import.meta.env.VITE_API_URL;
 
 // System Prompts (Personas da IA)
-const explainerSystemPrompt = "Atue como um tutor de programação especialista e amigável. Analise o código fornecido e explique detalhadamente, em português, o que ele faz, como funciona e quais conceitos de programação (ex: closure, assincronicidade, loops) ele demonstra. Estruture a resposta com clareza usando Markdown, focando em ser didático.";
-const refactorSystemPrompt = "Você é um engenheiro de software especialista em refatoração e conversão de código. Sua tarefa é modificar o código fornecido estritamente de acordo com a 'Instrução de Modificação'. Sua saída DEVE conter APENAS o bloco de código completo e revisado (ex: ```javascript\\n...\\n```), sem explicações, comentários fora do código ou texto de introdução. Use o mesmo idioma e estilo de formatação do código original.";
-const generatorSystemPrompt = "Você é um gerador de scripts e APIs prático e conciso. Sua tarefa é criar um script de código completo e funcional com base na solicitação do usuário. Sua saída DEVE conter APENAS o bloco de código completo e pronto para rodar (ex: ```python\\n...\\n```), sem texto introdutório, explicações ou notas fora do bloco de código.";
-const chatbotSystemPrompt = "Você é o GBit-Gemini-AI, um assistente de IA universal e muito útil. Responda a qualquer pergunta, crie qualquer tipo de conteúdo, e seja criativo e amigável. Responda em Português (Brasil).";
-
-// --- UTILITÁRIO: Fetch com Backoff (Adaptado para aceitar conteúdo flexível) ---
+const explainerSystemPrompt = "Atue como um tutor de programação especialista e amigável...";
+const refactorSystemPrompt = "Você é um engenheiro de software especialista...";
+const generatorSystemPrompt = "Você é um gerador de scripts...";
+const chatbotSystemPrompt = "Você é o GBit-Gemini-AI...";
 
 /**
- * Envia a requisição para a API Gemini com tratamento de erro e backoff exponencial.
- * @param {Array<Object>} contents - Array de objetos de conteúdo para a requisição (incluindo histórico para chat).
- * @param {string} systemInstruction - O System Prompt que define a persona da IA.
+ * Envia a requisição para o SEU BACKEND (Proxy) com tratamento de erro e backoff exponencial.
  */
 const fetchGemini = async (contents, systemInstruction, maxRetries = 5) => {
+    const requestBody = {
+        contents: contents,
+        systemInstruction: systemInstruction,
+    };
+
     const options = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            contents: contents,
-            systemInstruction: { parts: [{ text: systemInstruction }] },
-        })
+        body: JSON.stringify(requestBody)
     };
     
     for (let i = 0; i < maxRetries; i++) {
         try {
-            const response = await fetch(`${API_URL}?key=${apiKey}`, options);
-            if (!response.ok) throw new Error("Erro HTTP: " + response.status);
+            const response = await fetch(PROXY_URL, options);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Erro do Backend (HTTP ${response.status}): ${errorText.substring(0, 100)}`);
+            }
+
             return await response.json();
         } catch (e) {
             if (i < maxRetries - 1) {
                 const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
                 await new Promise(resolve => setTimeout(resolve, delay));
             } else {
-                throw new Error("Falha na comunicação com a API após várias tentativas.");
+                throw new Error("Falha na comunicação com a API após várias tentativas. (Verifique o servidor 3000)");
             }
         }
     }
 };
+
 
 // --- COMPONENTE AUXILIAR: Barra de Navegação Superior (Static) ---
 const NavItem = ({ name }) => (
@@ -418,10 +419,10 @@ const UniversalChatbotTool = () => {
                 role: msg.role === 'ai' ? 'model' : 'user',
                 parts: [{ text: msg.text }]
             }));
-            
             const result = await fetchGemini(apiContents, chatbotSystemPrompt);
-            const aiResponse = result?.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, não consegui gerar uma resposta.";
+           const aiResponse = result?.text || "Desculpe, não consegui gerar uma resposta.";
 
+            
             setChatHistory(prev => [...prev, { role: 'ai', text: aiResponse }]);
 
         } catch (e) {
@@ -688,3 +689,14 @@ export default function App() {
         </div>
     );
 }
+
+
+
+
+
+
+
+
+
+
+
