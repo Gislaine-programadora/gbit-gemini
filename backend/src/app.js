@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 // 🔥 Carregar chave API
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.VITE_PUBLIC_API_KEY;
 if (!apiKey) {
   console.error("❌ ERRO FATAL: Gemini API Key não encontrada no backend!");
 }
