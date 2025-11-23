@@ -1,19 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const http = require('http');
-const socketIo = require('socket.io');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
-const server = http.createServer(app);
-
-const io = socketIo(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST"]
-  }
-});
 
 app.use(cors());
 app.use(express.json());
@@ -28,10 +18,9 @@ const genAI = new GoogleGenerativeAI(apiKey);
 
 // --- ROTAS ---
 app.get("/", (req, res) => {
-  res.json({ message: "API funcionando!" });
+  res.json({ message: "API funcionando no Vercel!" });
 });
 
-// Rota principal do chatbot
 app.post("/api", async (req, res) => {
   try {
     const { contents, systemInstruction } = req.body;
@@ -40,7 +29,6 @@ app.post("/api", async (req, res) => {
       model: "gemini-2.0-flash"
     });
 
-    // ✔ CORREÇÃO DO ERRO AQUI
     const result = await model.generateContent({
       contents,
       system_instruction: {
@@ -65,10 +53,10 @@ app.post("/api", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`🚀 Backend rodando na porta ${PORT}`);
-});
+// ✅ Exporta como função para Vercel
+module.exports = app;
 
-module.exports = app; // ✅ exporta para Vercel
+
+
+
 
