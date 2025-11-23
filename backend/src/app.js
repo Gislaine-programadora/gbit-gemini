@@ -70,3 +70,5 @@ server.listen(PORT, () => {
   console.log(`🚀 Backend rodando na porta ${PORT}`);
 });
 
+module.exports = app; // ✅ exporta para Vercel
+
