@@ -3,7 +3,7 @@ import { Code, Copy, Zap, Loader2, BookOpen, Repeat, Lightbulb, MessageSquare, C
 
 // --- CONFIGURAÇÕES DA API GEMINI ---
 // Lê a URL do backend: http://localhost:3000/api
-const PROXY_URL = import.meta.env.VITE_API_URL;
+const PROXY_URL = import.meta.env.VITE_PUBLIC_API_KEY;
 
 // System Prompts (Personas da IA)
 const explainerSystemPrompt = "Atue como um tutor de programação especialista e amigável...";
